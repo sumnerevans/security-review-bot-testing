@@ -44,13 +44,17 @@ jobs:
               return;
             }
 
+            // Get PR number from issue
+            const prNumber = context.issue.number;
+            console.log(`PR number: ${prNumber}`);
+
             // Load the security review script
             const scriptPath = path.join(process.env.GITHUB_WORKSPACE, '.github/scripts/security-review.js');
             const scriptContent = fs.readFileSync(scriptPath, 'utf8');
 
             // Set up inputs for the script
             process.env.INPUT_GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-            process.env.INPUT_PR_NUMBER = context.issue.number;
+            process.env['INPUT_PR-NUMBER'] = prNumber.toString();
             process.env.INPUT_REVIEWER = context.payload.comment.user.login;
             process.env.INPUT_MODE = 'post-merge';
 
