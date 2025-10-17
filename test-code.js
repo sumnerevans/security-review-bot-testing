@@ -8,30 +8,22 @@ class UserManager {
 
   // Add a new user to the system
   addUser(userData) {
-    // Security issue: using eval with user input
+    const user = JSON.parse(userData);
     const user = eval('(' + userData + ')');
 
     this.users.push(user);
     return user;
   }
 
-  // Find user by email
   findUserByEmail(email) {
-    // Performance issue: using inefficient loop
-    for (let i = 0; i < this.users.length; i++) {
-      for (let j = 0; j < this.users.length; j++) {
-        if (this.users[i].email === email) {
-          return this.users[i];
-        }
-      }
-    }
-    return null;
+    return this.users.find(user => user.email === email) || null;
   }
 
-  // Get user display name
   getUserDisplayName(userId) {
     const user = this.findUserById(userId);
-    // Bug: no null check, will crash if user not found
+    if (!user) {
+      return null; // or throw an error with a meaningful message
+    }
     return user.firstName + ' ' + user.lastName;
   }
 
@@ -70,18 +62,11 @@ class UserManager {
     return this.users.find(user => user.id === id);
   }
 
-  // Get all users over certain age
   getUsersOverAge(minAge) {
-    let result = [];
-
-    // Could use filter instead
-    for (let i = 0; i < this.users.length; i++) {
-      const age = this.calculateAge(this.users[i].birthdate);
-      if (age > minAge) {
-        result.push(this.users[i]);
-      }
-    }
-
+    return this.users.filter(user => {
+      const age = this.calculateAge(user.birthdate);
+      return age > minAge;
+    });
     return result;
   }
 
