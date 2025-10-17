@@ -31,30 +31,9 @@ jobs:
 
             Please review this PR using the GitHub review system with inline comments. Follow these steps:
 
-            **STEP 1: Check Previous Reviews**
-            1. Use `mcp__github__get_pull_request_reviews` to get all previous reviews on this PR
-            2. Use `mcp__github__get_pull_request_comments` to get all review comments, including thread IDs
-            3. Identify comments made by you (the bot) in previous reviews
-            4. For each previous comment, check if the issue has been resolved by examining the current code:
-               - Use `mcp__github__get_pull_request_diff` to see current changes
-               - Use `mcp__github__get_file_contents` to check specific files if needed
-            5. For issues that are now fixed, resolve the conversation thread using GraphQL:
-               ```bash
-               gh api graphql -f query='
-                 mutation {
-                   resolveReviewThread(input: {threadId: "RT_kwDOABCD1234"}) {
-                     thread {
-                       isResolved
-                     }
-                   }
-                 }'
-               ```
-               Use the thread ID from the comment data (node_id field)
-
-            **STEP 2: Perform New Review**
             1. **Start a review**: Use `mcp__github__create_pending_pull_request_review` to begin a pending review
             2. **Get diff information**: Use `mcp__github__get_pull_request_diff` to understand the code changes and line numbers
-            3. **Add inline comments**: Use `mcp__github__add_comment_to_pending_review` for specific feedback on particular lines of code (only for NEW issues, not previously commented issues that are now fixed)
+            3. **Add inline comments**: Use `mcp__github__add_comment_to_pending_review` for specific feedback on particular lines of code
             4. **Submit the review**: Use `mcp__github__submit_pending_pull_request_review` with event type "COMMENT" to publish all comments with an overall summary
 
             Focus your review on:
@@ -64,13 +43,18 @@ jobs:
             - Security concerns
             - Test coverage
 
-            Use the repository's CLAUDE.md for guidance on style and conventions.
-            Provide inline comments for specific line-level issues.
-            Include a brief top-level summary when submitting the review that:
-            - Lists any previous issues that were resolved (with references to the resolved threads)
-            - Covers new findings and general observations
-            Use a <details> tag to document comprehensive detailed information about the review.
-            Keep feedback concise and actionable.
+            * Use the repository's CLAUDE.md for guidance on style and conventions.
+            * Provide inline comments for specific line-level issues.
+            * If there are any observations about the entire PR that don't fit
+              into specific line comments, then include a brief top-level
+              summary comment when submitting the review covering those.
+            * Use a <details> tag on the summary comment to comprehensively
+              document general observations.
+            * Keep feedback concise and actionable. Use GitHub's suggestion
+              feature where appropriate.
+            * If there are things that have already been commented on in the PR,
+              do not create a comment unless you believe that your comment
+              meaningfully adds to the previous comment.
 
           claude_args: |
-            --allowedTools "mcp__github__create_pending_pull_request_review,mcp__github__get_pull_request_diff,mcp__github__add_comment_to_pending_review,mcp__github__submit_pending_pull_request_review,mcp__github__get_pull_request,mcp__github__get_pull_request_reviews,mcp__github__get_pull_request_comments,mcp__github__get_file_contents,Bash(gh api:*)"
+            --allowedTools "mcp__github__create_pending_pull_request_review,mcp__github__get_pull_request_diff,mcp__github__add_comment_to_pending_review,mcp__github__submit_pending_pull_request_review,mcp__github__get_pull_request"
