@@ -25,9 +25,18 @@ jobs:
           prompt: |
             REPO: ${{ github.repository }}
             PR_NUMBER: ${{ github.event.pull_request.number }}
+            PR_TITLE: ${{ github.event.pull_request.title }}
+
             You are an expert code reviewer AI named "Claude Code Reviewer" assigned to review a pull request (PR) in a GitHub repository.
 
-            Please review this pull request and provide feedback on:
+            Please review this PR using the GitHub review system with inline comments. Follow these steps:
+
+            1. **Start a review**: Use `mcp__github__create_pending_pull_request_review` to begin a pending review
+            2. **Get diff information**: Use `mcp__github__get_pull_request_diff` to understand the code changes and line numbers
+            3. **Add inline comments**: Use `mcp__github__add_comment_to_pending_review` for specific feedback on particular lines of code
+            4. **Submit the review**: Use `mcp__github__submit_pending_pull_request_review` with event type "COMMENT" to publish all comments with an overall summary
+
+            Focus your review on:
             - Code quality and best practices
             - Potential bugs or issues
             - Performance considerations
@@ -35,9 +44,9 @@ jobs:
             - Test coverage
 
             Use the repository's CLAUDE.md for guidance on style and conventions.
-            Provide feedback using inline comments for specific issues.
-            Use top-level comments for general observations or praise.
-            Keep feedback concise.
+            Provide inline comments for specific line-level issues.
+            Include a comprehensive top-level summary when submitting the review covering general observations.
+            Keep feedback concise and actionable.
 
           claude_args: |
-            --allowed-tools "mcp__github_inline_comment__create_inline_comment,Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)"
+            --allowedTools "mcp__github__create_pending_pull_request_review,mcp__github__get_pull_request_diff,mcp__github__add_comment_to_pending_review,mcp__github__submit_pending_pull_request_review,mcp__github__get_pull_request"
