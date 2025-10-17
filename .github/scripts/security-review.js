@@ -24,9 +24,9 @@ function isSecurityReviewer(username, reviewers) {
 }
 
 /**
- * Format the approval comment with reviewer details
+ * Format the approval review body with reviewer details
  */
-function formatApprovalComment(reviewer, timestamp) {
+function formatApprovalBody(reviewer, timestamp) {
   return `Security Review Passed
 
 Reviewer: @${reviewer}
@@ -80,16 +80,17 @@ async function main() {
     }
 
     const timestamp = new Date().toISOString();
-    const comment = formatApprovalComment(reviewer, timestamp);
+    const body = formatApprovalBody(reviewer, timestamp);
 
-    await octokit.rest.issues.createComment({
+    await octokit.rest.pulls.createReview({
       owner,
       repo,
-      issue_number: prNumber,
-      body: comment
+      pull_number: prNumber,
+      body,
+      event: 'APPROVE'
     });
 
-    core.info(`Posted security review approval comment for reviewer @${reviewer}`);
+    core.info(`Posted security review approval for reviewer @${reviewer}`);
   } else if (mode === 'pre-merge') {
     // Pre-merge: check if a security reviewer approved the latest commit
     const { data: reviews } = await octokit.rest.pulls.listReviews({
@@ -121,13 +122,14 @@ async function main() {
     // Use the most recent approval
     const latestApproval = approvals[approvals.length - 1];
     const timestamp = latestApproval.submitted_at;
-    const comment = formatApprovalComment(latestApproval.user.login, timestamp);
+    const body = formatApprovalBody(latestApproval.user.login, timestamp);
 
-    await octokit.rest.issues.createComment({
+    await octokit.rest.pulls.createReview({
       owner,
       repo,
-      issue_number: prNumber,
-      body: comment
+      pull_number: prNumber,
+      body,
+      event: 'APPROVE'
     });
 
     core.info(`Posted automatic security review approval for @${latestApproval.user.login}`);
