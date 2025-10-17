@@ -20,13 +20,19 @@ Reason: @username who is in the security reviewers group as of [timestamp] appro
 
 ### Post-Merge Security Reviews
 
-Security reviewers can manually approve a PR after it has been merged by commenting:
+Security reviewers can manually approve a PR after it has been merged by commenting either:
 
 ```
-@github-actions security review passed
+security review passed
 ```
 
-The bot will validate that the commenter is in the security reviewers group and post the official approval comment.
+or
+
+```
+security review complete
+```
+
+The phrases are case-insensitive. The bot will validate that the commenter is in the security reviewers group and post the official approval comment.
 
 ### Pre-Merge Security Reviews (Automatic)
 
@@ -55,7 +61,7 @@ To add or remove security reviewers, update this file and commit the changes.
 ### Post-Merge Security Review Workflow
 
 - **File**: `.github/workflows/post-merge-security-review.yml`
-- **Trigger**: Issue comment containing `@github-actions security review passed`
+- **Trigger**: Issue comment containing "security review passed" or "security review complete" (case-insensitive)
 - **Permissions**: Validates commenter is a security reviewer before posting approval
 
 ### Pre-Merge Security Review Workflow
@@ -106,7 +112,7 @@ To test the bot:
 
 1. Add test users to `.github/security-reviewers.json`
 2. Create a test PR
-3. For post-merge: Merge PR, then comment `@github-actions security review passed`
+3. For post-merge: Merge PR, then comment "security review passed" or "security review complete"
 4. For pre-merge: Approve the PR with a security reviewer account, then merge
 
 ## Security Considerations

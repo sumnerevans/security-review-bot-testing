@@ -9,7 +9,8 @@ jobs:
     # Only run on PR comments that match the trigger phrase
     if: |
       github.event.issue.pull_request &&
-      contains(github.event.comment.body, '@github-actions security review passed')
+      (contains(toLower(github.event.comment.body), 'security review passed') ||
+       contains(toLower(github.event.comment.body), 'security review complete'))
     runs-on: ubuntu-latest
     permissions:
       contents: read
