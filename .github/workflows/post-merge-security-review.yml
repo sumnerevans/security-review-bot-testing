@@ -6,11 +6,8 @@ on:
 
 jobs:
   security-review-comment:
-    # Only run on PR comments that match the trigger phrase
-    if: |
-      github.event.issue.pull_request &&
-      (contains(toLower(github.event.comment.body), 'security review passed') ||
-       contains(toLower(github.event.comment.body), 'security review complete'))
+    # Only run on PR comments
+    if: github.event.issue.pull_request
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -36,6 +33,16 @@ jobs:
           script: |
             const fs = require('fs');
             const path = require('path');
+
+            // Check if comment contains trigger phrase (case-insensitive)
+            const commentBody = context.payload.comment.body.toLowerCase();
+            const hasTriggerPhrase = commentBody.includes('security review passed') ||
+                                     commentBody.includes('security review complete');
+
+            if (!hasTriggerPhrase) {
+              console.log('Comment does not contain security review trigger phrase. Skipping.');
+              return;
+            }
 
             // Load the security review script
             const scriptPath = path.join(process.env.GITHUB_WORKSPACE, '.github/scripts/security-review.js');
