@@ -1,0 +1,5 @@
+{
+  "organization": "your-org-name",
+  "team_slug": "security-reviewers",
+  "description": "Configuration for security review team. The team_slug is the URL-friendly version of the team name (e.g., 'security-reviewers' for team 'Security Reviewers')."
+}
