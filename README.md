@@ -40,21 +40,21 @@ If a security reviewer approves the latest commit on a PR before it's merged, th
 
 ## Configuration
 
-### Security Reviewers Team
+### Security Reviewers
 
-Authorized security reviewers are managed through a GitHub organization team. Configure the team in `.github/security-review-config.json`:
+Authorized security reviewers are configured in `.github/security-reviewers.json`:
 
 ```json
 {
-  "organization": "your-org-name",
-  "team_slug": "security-reviewers",
-  "description": "Configuration for security review team. The team_slug is the URL-friendly version of the team name."
+  "reviewers": [
+    "octocat",
+    "hubot"
+  ],
+  "description": "List of GitHub usernames authorized to perform security reviews."
 }
 ```
 
-To add or remove security reviewers, add or remove them from the GitHub team in your organization. The bot will fetch the current team membership dynamically on each run.
-
-**Required Permissions**: The `GITHUB_TOKEN` must have permission to read organization team membership. This is automatically granted when the workflow runs in a repository owned by the organization.
+To add or remove security reviewers, update this file and commit the changes.
 
 ## Workflows
 
@@ -92,11 +92,11 @@ npm install
 ```
 .github/
 ├── scripts/
-│   └── security-review.js           # Core logic for security review validation
+│   └── security-review.js       # Core logic for security review validation
 ├── workflows/
 │   ├── post-merge-security-review.yml   # Manual post-merge approval workflow
 │   └── pre-merge-security-review.yml    # Automatic pre-merge approval workflow
-└── security-review-config.json      # Organization and team configuration
+└── security-reviewers.json      # Authorized reviewers configuration
 ```
 
 ## Permissions Required
@@ -105,22 +105,19 @@ The GitHub Actions workflows require the following permissions:
 - `contents: read` - Read repository contents
 - `pull-requests: write` - Post comments on PRs
 - `issues: write` - Post comments on issues (PRs are issues)
-- `organization: read` (implicit) - Read organization team membership
 
 ## Testing
 
 To test the bot:
 
-1. Configure your organization and team in `.github/security-review-config.json`
-2. Add test users to the GitHub team in your organization
-3. Create a test PR
-4. For post-merge: Merge PR, then comment "security review passed" or "security review complete"
-5. For pre-merge: Approve the PR with a security reviewer account, then merge
+1. Add test users to `.github/security-reviewers.json`
+2. Create a test PR
+3. For post-merge: Merge PR, then comment "security review passed" or "security review complete"
+4. For pre-merge: Approve the PR with a security reviewer account, then merge
 
 ## Security Considerations
 
-- Only users in the configured GitHub organization team can trigger security review approvals
-- Team membership is fetched dynamically on each workflow run, ensuring up-to-date authorization
+- Only users listed in `security-reviewers.json` can trigger security review approvals
 - The bot validates approvals against the latest commit SHA for pre-merge reviews
 - All approvals include timestamp and reviewer information for audit trails
 - Manual post-merge approvals require explicit comment trigger

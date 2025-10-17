@@ -47,11 +47,6 @@ jobs:
             const prNumber = context.issue.number;
             console.log(`PR number: ${prNumber}`);
 
-            // Load configuration
-            const configPath = path.join(process.env.GITHUB_WORKSPACE, '.github/security-review-config.json');
-            const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-            console.log(`Using team: ${config.organization}/${config.team_slug}`);
-
             // Load the security review script
             const scriptPath = path.join(process.env.GITHUB_WORKSPACE, '.github/scripts/security-review.js');
             const scriptContent = fs.readFileSync(scriptPath, 'utf8');
@@ -61,8 +56,6 @@ jobs:
             process.env['INPUT_PR-NUMBER'] = prNumber.toString();
             process.env.INPUT_REVIEWER = context.payload.comment.user.login;
             process.env.INPUT_MODE = 'post-merge';
-            process.env.INPUT_ORG = config.organization;
-            process.env['INPUT_TEAM-SLUG'] = config.team_slug;
 
             // Execute the script
             eval(scriptContent);

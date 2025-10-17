@@ -1,19 +1,12 @@
 const fs = require('fs');
 
 /**
- * Load security reviewers from GitHub team
+ * Load security reviewers from configuration file
  */
-async function loadSecurityReviewers(octokit, org, teamSlug) {
-  try {
-    const { data: members } = await octokit.rest.teams.listMembersInOrg({
-      org,
-      team_slug: teamSlug,
-      per_page: 100
-    });
-    return members.map(member => member.login);
-  } catch (error) {
-    throw new Error(`Failed to fetch team members: ${error.message}`);
-  }
+function loadSecurityReviewers() {
+  const configPath = '.github/security-reviewers.json';
+  const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+  return config.reviewers;
 }
 
 /**
@@ -59,13 +52,8 @@ async function main() {
     return;
   }
 
-  // Get organization and team configuration
-  const org = core.getInput('org', { required: true });
-  const teamSlug = core.getInput('team-slug', { required: true });
-
-  // Load security reviewers from GitHub team
-  core.info(`Fetching members from team ${org}/${teamSlug}`);
-  const securityReviewers = await loadSecurityReviewers(octokit, org, teamSlug);
+  // Load security reviewers
+  const securityReviewers = loadSecurityReviewers();
   core.info(`Security reviewers: ${securityReviewers.join(', ')}`);
 
   // Get the reviewer from workflow input
