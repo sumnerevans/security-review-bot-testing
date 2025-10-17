@@ -39,7 +39,13 @@ async function main() {
 
   const context = github.context;
   const { owner, repo } = context.repo;
-  const prNumber = context.payload.pull_request?.number || core.getInput('pr-number');
+
+  // Try to get PR number from context first, then from input
+  let prNumber = context.payload.pull_request?.number;
+  if (!prNumber) {
+    const prNumberInput = core.getInput('pr-number');
+    prNumber = prNumberInput ? parseInt(prNumberInput, 10) : null;
+  }
 
   if (!prNumber) {
     core.setFailed('PR number not found');
