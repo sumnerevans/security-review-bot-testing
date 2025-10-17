@@ -66,9 +66,10 @@ jobs:
 
             Use the repository's CLAUDE.md for guidance on style and conventions.
             Provide inline comments for specific line-level issues.
-            Include a comprehensive top-level summary when submitting the review that:
+            Include a brief top-level summary when submitting the review that:
             - Lists any previous issues that were resolved (with references to the resolved threads)
             - Covers new findings and general observations
+            Use a <details> tag to document comprehensive detailed information about the review.
             Keep feedback concise and actionable.
 
           claude_args: |
