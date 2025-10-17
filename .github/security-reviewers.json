@@ -1,7 +1,7 @@
 {
   "reviewers": [
-    "octocat",
-    "hubot"
+    "sumnerevans",
+    "nevarro-bot"
   ],
   "description": "List of GitHub usernames authorized to perform security reviews. Update this list to add or remove security reviewers."
 }
