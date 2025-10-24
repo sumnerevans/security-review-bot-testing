@@ -1,8 +1,8 @@
-name: PR Review
+name: Claude Code PR Review
 
 on:
   pull_request:
-    types: [opened, synchronize, ready_for_review, reopened]
+    types: [opened, ready_for_review, reopened]
 
 jobs:
   review:
@@ -13,7 +13,7 @@ jobs:
       id-token: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
 
@@ -21,15 +21,16 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-
+          track_progress: true
           prompt: |
             REPO: ${{ github.repository }}
             PR_NUMBER: ${{ github.event.pull_request.number }}
             PR_TITLE: ${{ github.event.pull_request.title }}
 
-            You are an expert code reviewer AI named "Claude Code Reviewer" assigned to review a pull request (PR) in a GitHub repository.
+            You are an expert code reviewer AI assigned to review a pull
+            request (PR) in a GitHub repository.
 
-            Please review this PR using the GitHub review system with inline comments. Follow these steps:
+            Please review this PR using the GitHub review system with **inline comments**. Follow these steps:
 
             1. **Start a review**: Use `mcp__github__create_pending_pull_request_review` to begin a pending review
             2. **Get diff information**: Use `mcp__github__get_pull_request_diff` to understand the code changes and line numbers
@@ -37,24 +38,46 @@ jobs:
             4. **Submit the review**: Use `mcp__github__submit_pending_pull_request_review` with event type "COMMENT" to publish all comments with an overall summary
 
             Focus your review on:
-            - Code quality and best practices
-            - Potential bugs or issues
-            - Performance considerations
-            - Security concerns
-            - Test coverage
+
+            * Code quality and best practices
+            * Potential bugs or issues
+            * Performance considerations
+            * Security concerns
+            * Test coverage
+
+            Guidelines for your review:
 
             * Use the repository's CLAUDE.md for guidance on style and conventions.
-            * Provide inline comments for specific line-level issues.
-            * If there are any observations about the entire PR that don't fit
-              into specific line comments, then include a brief top-level
-              summary comment when submitting the review covering those.
-            * Use a <details> tag on the summary comment to comprehensively
-              document general observations.
-            * Keep feedback concise and actionable. Use GitHub's suggestion
-              feature where appropriate.
+            * Provide inline comments for specific line-level problems.
+              * If the code is good, do not add comments just to say "looks good"
+              * Focus comments on areas that need improvement or have issues.
+              * Keep feedback concise and actionable. Use GitHub's suggestion
+                feature where appropriate. Make sure to include all relevant
+                lines in the suggestion by highlighting the full block of code
+                that needs to be changed.
+            * Provide a very brief top-level summary comment when submitting the
+              review which has the following format:
+
+                **Recommended Action:** [Approve :white_check_mark:|Request Changes :x:]
+
+                [only include this section if there are critical issues that don't fit into specific line comments]
+                **:warning: Critical Issues:**
+                - [Brief description of critical issue 1]
+                - [Brief description of critical issue 2]
+                ...
+
+                <details>
+                <summary>Details</summary>
+
+                [Detailed explanation of critical issues]
+
+                [Additional non-critical overall observations that don't fit into specific line comments, organized by severity]
+
+                </details>
             * If there are things that have already been commented on in the PR,
               do not create a comment unless you believe that your comment
               meaningfully adds to the previous comment.
+            * Make all comments VERY TERSE, and only include essential information.
 
           claude_args: |
             --allowedTools "mcp__github__create_pending_pull_request_review,mcp__github__get_pull_request_diff,mcp__github__add_comment_to_pending_review,mcp__github__submit_pending_pull_request_review,mcp__github__get_pull_request"
